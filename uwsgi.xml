@@ -1,0 +1,14 @@
+<uwsgi>
+  <chdir>/var/www/autoshots/project/autoshots</chdir>
+  <wsgi-file>/var/www/autoshots/project/autoshots/autoshots.py</wsgi-file>
+  <callable>app</callable>
+
+  <socket>127.0.0.1:13768</socket>
+  <chmod-socket>666</chmod-socket>
+
+  <master />
+  <processes>4</processes>
+
+  <vacuum />
+  <no-orphans />
+</uwsgi>
