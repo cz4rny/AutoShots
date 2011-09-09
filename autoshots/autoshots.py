@@ -59,7 +59,8 @@ class Config(object):
     #: Are we testing?
     TESTING = False
     #: URI for the database.
-    DATABASE_URI = 'sqlite://:memory:'
+    DATABASE_URI = ('sqlite:///' + os.path.join(os.path.dirname(
+        os.path.abspath( __file__)), 'autoshots.db'))
     #: URL root
     URL_ROOT = None
 
@@ -67,8 +68,6 @@ class ProductionConfig(Config):
     """ How we're working on production. """
     #: This elaborate setting makes the sqlite database file
     #: reside in the same dir as this file. Needs to be an absolute path.
-    DATABASE_URI = ('sqlite:///' + os.path.join(os.path.dirname(
-        os.path.abspath( __file__)), 'autoshots.db'))
     URL_ROOT = '/autoshots'
 
 class DevelopmentConfig(Config):
