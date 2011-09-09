@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright 2011 Cezary Krzyżanowski. All rights reserved.
@@ -49,13 +49,52 @@ import os.path
 
 import job
 
+class Config(object):
+    """ Default configuration.
+
+        Put all values here, and override in other classes.
+    """
+    #: Run framework in debug mode?
+    DEBUG = False
+    #: Are we testing?
+    TESTING = False
+    #: URI for the database.
+    DATABASE_URI = 'sqlite://:memory:'
+    #: URL root
+    URL_ROOT = None
+
+class ProductionConfig(Config):
+    """ How we're working on production. """
+    #: This elaborate setting makes the sqlite database file
+    #: reside in the same dir as this file. Needs to be an absolute path.
+    DATABASE_URI = ('sqlite:///' + os.path.join(os.path.dirname(
+        os.path.abspath( __file__)), 'autoshots.db'))
+    URL_ROOT = '/autoshots'
+
+class DevelopmentConfig(Config):
+    """ Developement settings. """
+    DEBUG = True
+
+class TestingConfig(Config):
+    """ Test environemtn settings. """
+    TESTING = True
+
+#: This maps the correct config class in regard to the environmental mode.
+mode_mapping = {
+    'DEV': DevelopmentConfig,
+    'PROD': ProductionConfig,
+    'TEST': TestingConfig,
+}
+
+#: The config class with values depending on the
+#: environmental variable AUTOSHOTS_MODE
+config = mode_mapping[os.getenv('AUTOSHOTS_MODE', 'DEV')]()
+
 app = Flask(__name__)
-app.debug = True
-# This elaborate setting makes the sqlite database file
-# reside in the same dir as this file. Needs to be an absolute path.
-db_path = ('sqlite:///' + os.path.join(os.path.dirname(
-    os.path.abspath( __file__)), 'autoshots.db'))
-app.config['SQLALCHEMY_DATABASE_URI'] = db_path
+app.debug = config.DEBUG
+app.testing = config.TESTING
+app.config['APPLICATION_ROOT'] = config.URL_ROOT
+app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URI
 app.secret_key = \
     '\x8b\x90\xd39\xfa\t\xa9m9#\xd0!\xac<\x81\xe3\xee\xc7e\x8b 7\xf3\xa1'
 
