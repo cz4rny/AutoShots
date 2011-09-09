@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>Welcome to autoshots!</title>
+</head>
+<body>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  <form action="/add" method="post">
+    <ul>
+      <li><input type="text" name="url"></li>
+      <li><input type="submit" value="Send"></li>
+    </ul>
+  </form>
+  {% macro display(job) -%}
+    <li><a href="{{base_url + job.url}}">
+    {% if (now - job.timestamp).days == 0 %}
+      {{job.timestamp.strftime('%H:%M')}}
+    {% elif (now - job.timestamp).days < 7 %}
+      {{job.timestamp.strftime('%A %H:%M')}}
+    {% elif now.year != job.timestamp.year %}
+      {{job.timestamp.strftime('%Y.%M.%d %H:%M')}}
+    {% else %}
+      {{job.timestamp.strftime('%d %B %H:%M')}}
+    {% endif %}
+    {{job.url}}</a></li>
+  {%- endmacro %}
+  {% if running_jobs %}
+    <h1>Running jobs:</h1>
+    <ul id="running_jobs">
+    {% for job in running_jobs %}
+      {{ display(job) }}
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if history_jobs %}
+    <h1>History jobs:</h1>
+    <ul id="history_jobs">
+    {% for job in history_jobs %}
+      {{ display(job) }}
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+</body>
+</html>
